@@ -8,8 +8,13 @@ Docs: https://docs.openclaw.ai
 
 - Google Meet/Voice Call: make Twilio dial-in joins speak through the realtime Gemini voice bridge with paced audio streaming, backpressure-aware buffering, barge-in queue clearing, and no TwiML fallback during realtime speech, giving Meet participants a much snappier OpenClaw voice agent. (#77064) Thanks @scoootscooob.
 
+### Breaking
+
+- Active Memory: the default blocking recall tool allowlist is now `memory_search` and `memory_get` only. Set `plugins.entries.active-memory.config.toolsAllow: ["memory_recall"]` when using `memory-lancedb`, or set it to the recall tools exposed by a custom memory plugin such as Lossless Claw.
+
 ### Changes
 
+- Plugins/active-memory: add `config.toolsAllow` so the blocking recall subagent can use custom memory-provider tools, make the default prompt list the resolved tools instead of hardcoding memory-core/LanceDB fallback rules, and degrade missing or failed recall tools to empty memory so the main reply continues.
 - Plugins/active-memory: skip session-store channel entries that contain `:` when resolving the recall subagent's channel, so QQ c2c agent IDs (e.g. `c2c:10D4F7C2…`) and other scoped conversation IDs do not reach bundled-plugin `dirName` validation and crash the recall run. The same guard already applied to explicit `channelId` params (#76704); this extends it to store-derived channels. (#77396) Thanks @hclsys.
 - Models/auth: add `openclaw models auth list [--provider <id>] [--json]` so users can inspect saved per-agent auth profiles without dumping secrets or hitting the old “too many arguments” path. Thanks @vincentkoc.
 - Control UI/header: show the active agent name in dashboard breadcrumbs without adding the current session key, keeping non-chat views oriented without crowding the topbar.
